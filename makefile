@@ -1,16 +1,11 @@
-TARGET = project #название проекта
+project : main.o lodepng.o
+	gcc main.o lodepng.o -o project
 
-PREF_SRC = ./src/ #папка с файлами исходного кода
-PREF_OBJ = ./obj/ #папка с объектными файлами
+main.o : main.c
+	gcc -c main.c -o main.o
 
-SRC = $(wildcard $(PREF_SRC)*.c)
-OBJ = $(patsubst $(PREF_SRC)%.c, $(PREF_OBJ)%.o, $(SRC))
+lodepng.o : lodepng.c
+	gcc -c lodepng.c -o lodepng.o
 
-$(TARGET) : $(OBJ)
-	gcc $(OBJ) -o $(TARGET)
-
-$(PREF_OBJ)%.o : $(PREF_SRC)%.c
-	gcc -c $< -o $@
-
-clean : #очистка (удаление объектных файлов)
-	rm $(TARGET) $(PREF_OBJ)*.o
+clean : 
+	rm project *.o

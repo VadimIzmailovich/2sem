@@ -22,7 +22,7 @@ unsigned char* load_png(const char* filename, unsigned int* width, unsigned int*
 void write_png(const char* filename, const unsigned char* image, unsigned width, unsigned height)
 {
   unsigned char* png;
-  long unsigned int pngsize;
+  long long unsigned int pngsize;
   int error = lodepng_encode32(&png, &pngsize, image, width, height);
   if(error == 0) {
       lodepng_save_file(png, pngsize, filename);
@@ -39,9 +39,9 @@ void contrast(unsigned char *col, int bw_size)
     int i; 
     for(i=0; i < bw_size; i++)
     {
-        if(col[i] < 55)
+        if(col[i] < 60)
         col[i] = 0; 
-        if(col[i] > 195)
+        if(col[i] >= 60)
         col[i] = 255;
     } 
     return; 
@@ -74,17 +74,26 @@ void color(unsigned char *blr_pic, unsigned char *res, int size)
         res[i*4+3]=255; 
     } 
     return; 
-} 
+}
+
+int countShips(unsigned char *pic, int size) {
+  int count = 0;
+  for(int i = 0; i < size; i++) {
+    if(pic[i] == 255) count++;
+  }
+
+  return count;
+}
   
 int main() 
 { 
-    const char* filename = "skull.png"; 
+    const char* filename = "image.png"; 
     unsigned int width, height;
     int size;
     int bw_size;
     
     // Прочитали картинку
-    unsigned char* picture = load_png("skull.png", &width, &height); 
+    unsigned char* picture = load_png("image.png", &width, &height); 
     if (picture == NULL)
     { 
         printf("Problem reading picture from the file %s. Error.\n", filename); 
@@ -95,40 +104,22 @@ int main()
     bw_size = width * height;
     
     
-    unsigned char* bw_pic = (unsigned char*)malloc(bw_size*sizeof(unsigned char)); 
+    unsigned char* bw_pic = (unsigned char*)malloc(bw_size*sizeof(unsigned char));
     unsigned char* blr_pic = (unsigned char*)malloc(bw_size*sizeof(unsigned char)); 
     unsigned char* finish = (unsigned char*)malloc(size*sizeof(unsigned char)); 
- 
-    // Например, поиграли с  контрастом
-    contrast(bw_pic, bw_size); 
-        // посмотрим на промежуточные картинки
-    write_png("contrast.png", finish, width, height);
+    contrast(picture, size); 
+
+    write_png("contrast.png", picture, width, height);
+
+    int count = countShips(picture, size);
+
+    double cnt = count / 3.0;
+
+    printf("total ships = %.0lf", cnt);
     
-    // поиграли с Гауссом
-    Gauss_blur(bw_pic, blr_pic, width, height); 
-    // посмотрим на промежуточные картинки
-    write_png("gauss.png", finish, width, height);
-    
-    // сделали еще что-нибудь
-    // .....
-    // ....
-    // ....
-    // ....
-    // ....
-    // ....
-    // ....
-    //
-    
-    write_png("intermediate_result.png", finish, width, height);
-    color(blr_pic, finish, bw_size); 
-    
-    // выписали результат
-    write_png("picture_out.png", finish, width, height); 
-    
-    // не забыли почистить память!
-    free(bw_pic); 
+    free(bw_pic);
     free(blr_pic); 
-    free(finish); 
+    free(finish);
     free(picture); 
     
     return 0; 
