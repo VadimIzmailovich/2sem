@@ -36,15 +36,15 @@ void write_png(const char* filename, const unsigned char* image, unsigned width,
 // вариант огрубления серого цвета в ЧБ 
 void contrast(unsigned char *col, int bw_size)
 { 
-    int i; 
+    int i, count = 0; 
     for(i=0; i < bw_size; i++)
     {
         if(col[i] < 60)
         col[i] = 0; 
-        if(col[i] >= 60)
-        col[i] = 255;
+        else {
+          col[i] = 255;
+        }
     } 
-    return; 
 } 
 
 // Гауссово размыттие
@@ -63,26 +63,31 @@ void Gauss_blur(unsigned char *col, unsigned char *blr_pic, int width, int heigh
 } 
 
 //  Место для экспериментов
-void color(unsigned char *blr_pic, unsigned char *res, int size)
+void color(unsigned char *bw_pic, unsigned char *res, int size)
 { 
   int i;
-    for(i=1;i<size;i++) 
+    for(i=0;i<size;i++) 
     { 
-        res[i*4]=40+blr_pic[i]+0.35*blr_pic[i-1]; 
-        res[i*4+1]=65+blr_pic[i]; 
-        res[i*4+2]=170+blr_pic[i]; 
+        res[i*4]=bw_pic[i]; 
+        res[i*4+1]=bw_pic[i]; 
+        res[i*4+2]=bw_pic[i]; 
         res[i*4+3]=255; 
     } 
     return; 
 }
 
-int countShips(unsigned char *pic, int size) {
+int cnt(unsigned char* pic, int bw_size) {
   int count = 0;
-  for(int i = 0; i < size; i++) {
+  for(int i = 0; i < bw_size; i++) {
     if(pic[i] == 255) count++;
   }
 
   return count;
+}
+
+unsigned char rgb_to_bw(unsigned char r, unsigned char g, unsigned char b)
+{
+    return (unsigned char)((r + g + b) / 3);
 }
   
 int main() 
@@ -107,15 +112,20 @@ int main()
     unsigned char* bw_pic = (unsigned char*)malloc(bw_size*sizeof(unsigned char));
     unsigned char* blr_pic = (unsigned char*)malloc(bw_size*sizeof(unsigned char)); 
     unsigned char* finish = (unsigned char*)malloc(size*sizeof(unsigned char)); 
-    contrast(picture, size); 
+    
+    for(int i = 0; i < bw_size; i++) {
+      bw_pic[i] = rgb_to_bw(picture[4 * i], picture[4 * i + 1], picture[4 * i + 2]);
+    }
 
-    write_png("contrast.png", picture, width, height);
+    color(bw_pic, finish, bw_size); //* bw записываем в rgb
 
-    int count = countShips(picture, size);
+    //contrast(bw_pic, bw_size); 
 
-    double cnt = count / 3.0;
+    write_png("contrast.png", finish, width, height);
 
-    printf("total ships = %.0lf", cnt);
+    //double count = cnt(bw_pic, bw_size) / 3.0;
+
+    //printf("total ships = %.0lf\n", count);
     
     free(bw_pic);
     free(blr_pic); 
