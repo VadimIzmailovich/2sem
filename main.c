@@ -115,17 +115,17 @@ int main()
     
     for(int i = 0; i < bw_size; i++) {
       bw_pic[i] = rgb_to_bw(picture[4 * i], picture[4 * i + 1], picture[4 * i + 2]);
-    }
+    } //* создаем массив в bw
+    
+    contrast(bw_pic, bw_size);
 
     color(bw_pic, finish, bw_size); //* bw записываем в rgb
 
-    //contrast(bw_pic, bw_size); 
-
     write_png("contrast.png", finish, width, height);
 
-    //double count = cnt(bw_pic, bw_size) / 3.0;
+    double count = cnt(bw_pic, bw_size) / 3.0;
 
-    //printf("total ships = %.0lf\n", count);
+    printf("total ships = %.0lf\n", count);
     
     free(bw_pic);
     free(blr_pic); 
