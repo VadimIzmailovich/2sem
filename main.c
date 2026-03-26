@@ -123,7 +123,7 @@ int main()
 
     write_png("contrast.png", finish, width, height);
 
-    double count = cnt(bw_pic, bw_size) / 3.0;
+    double count = cnt(bw_pic, bw_size) / 2.0;
 
     printf("total ships = %.0lf\n", count);
     

@@ -9,3 +9,6 @@ lodepng.o : lodepng.c
 
 clean : 
 	rm project *.o
+
+run : project
+	./project
