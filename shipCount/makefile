@@ -8,7 +8,7 @@ lodepng.o : lodepng.c
 	gcc -c lodepng.c -o lodepng.o
 
 clean : 
-	rm project *.o
+	rm project *.o contrast.png
 
 run : project
 	./project
